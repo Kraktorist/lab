@@ -21,5 +21,6 @@ clone the repo and run vagrant
 mkdir lab
 cd lab
 git clone https://github.com/Kraktorist/lab.git
+cd vagrant-k8s
 vagrant up
 ```

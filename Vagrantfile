@@ -1,3 +1,11 @@
+$node1_ip = "192.168.1.51"
+$node1_name = "hmdck01"
+$node2_ip = "192.168.1.52"
+$node2_name = "hmdck02"
+$k8s_ip = "192.168.1.53"
+$k8s_name = "hmkbs01"
+$pod_network = "10.244.0.0/16"
+
 $install_docker = <<-'SCRIPT'
 sudo yum install -y yum-utils
 sudo yum-config-manager \
@@ -33,28 +41,31 @@ systemctl enable docker.service
 systemctl enable kubelet
 SCRIPT
 
-$install_k8s = <<-'SCRIPT'
+$install_k8s = <<-SCRIPT
 mkdir -p ~/.ssh
-ssh-keyscan -H 192.168.1.51 >> /home/vagrant/.ssh/known_hosts
-ssh-keyscan -H 192.168.1.52 >> /home/vagrant/.ssh/known_hosts
+ssh-keyscan -H #{$node1_ip} >> /home/vagrant/.ssh/known_hosts
+ssh-keyscan -H #{$node2_ip} >> /home/vagrant/.ssh/known_hosts
 cp /home/vagrant/.ssh/id_rsa /root/.ssh/
 cp /home/vagrant/.ssh/known_hosts /root/.ssh/known_hosts
 
-kubeadm init --apiserver-advertise-address=192.168.1.53 --pod-network-cidr=10.244.0.0/16
+kubeadm init --apiserver-advertise-address=#{$k8s_ip} --pod-network-cidr=#{$pod_network}
 export KUBECONFIG=/etc/kubernetes/admin.conf
+echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /root/.bashrc
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 token=`kubeadm token create`
 hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
    openssl dgst -sha256 -hex | sed 's/^.* //'`
-ssh vagrant@192.168.1.51 sudo kubeadm join --token ${token} 192.168.1.53:6443 --discovery-token-ca-cert-hash sha256:${hash}
-ssh vagrant@192.168.1.52 sudo kubeadm join --token ${token} 192.168.1.53:6443 --discovery-token-ca-cert-hash sha256:${hash}
+ssh vagrant@#{$node1_ip} sudo kubeadm join --token ${token} #{$k8s_ip}:6443 --discovery-token-ca-cert-hash sha256:${hash}
+ssh vagrant@#{$node2_ip} sudo kubeadm join --token ${token} #{$k8s_ip}:6443 --discovery-token-ca-cert-hash sha256:${hash}
 SCRIPT
 
+### N O D E 1 ###
+
 Vagrant.configure("2") do |config|
-  config.vm.define 'hmdck01' do |config|
+  config.vm.define $node1_name do |config|
     config.vm.box = "centos/7"
-    config.vm.hostname = "hmdck01.local"
-    config.vm.network "private_network", ip: "192.168.1.51"
+    config.vm.hostname = $node1_name
+    config.vm.network "private_network", ip: $node1_ip
     config.vm.provision "shell", inline: $kubernetes_prerequisites
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.vm.provision :shell, :inline =>"
@@ -71,11 +82,16 @@ Vagrant.configure("2") do |config|
   end
 end
 
+### N O D E 1 end ###
+
+
+### N O D E 2 ###
+
 Vagrant.configure("2") do |config|
-  config.vm.define 'hmdck02' do |config|
+  config.vm.define $node2_name do |config|
     config.vm.box = "centos/7"
-    config.vm.hostname = "hmdck02.local"
-    config.vm.network "private_network", ip: "192.168.1.52"
+    config.vm.hostname = $node2_name
+    config.vm.network "private_network", ip: $node2_ip
     config.vm.provision "shell", inline: $kubernetes_prerequisites
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.vm.provision :shell, :inline =>"
@@ -92,18 +108,24 @@ Vagrant.configure("2") do |config|
   end
 end
 
+### N O D E 2 end ###
+
+
+### K 8 S ###
+
 Vagrant.configure("2") do |config|
-  config.vm.define 'hmkbs01' do |config|
+  config.vm.define $k8s_name do |config|
     config.vm.provider "virtualbox" do |vb|
       vb.cpus = "2"
       vb.memory = "2048"
     end
     config.vm.box = "centos/7"
-    config.vm.hostname = "hmkbs01.local"
-    config.vm.network "private_network", ip: "192.168.1.53"
+    config.vm.hostname = $k8s_name
+    config.vm.network "private_network", ip: $k8s_ip
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
     config.vm.provision "shell", inline: $kubernetes_prerequisites
     config.vm.provision "shell", inline: $install_k8s
   end
 end
 
+### K 8 S end ###

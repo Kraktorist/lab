@@ -1,21 +1,15 @@
 import os
 import socket
-print(socket.gethostname())
-print(os.environ)
+import json
 
-from http.server import BaseHTTPRequestHandler, HTTPServer # python3
-class HandleRequests(BaseHTTPRequestHandler):
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+from http.server import BaseHTTPRequestHandler,HTTPServer
 
-    def do_GET(self):
-        self._set_headers()
-        self.wfile.write("received get request")
+class HttpProcessor(BaseHTTPRequestHandler):
+  def do_GET(self):
+    self.send_response(200)
+    self.send_header('content-type','application/json')
+    self.end_headers()
+    self.wfile.write(json.dumps(dict(os.environ),sort_keys=True, indent=4).encode())
 
-host = ''
-port = 80
-HTTPServer((host, port), HandleRequests).serve_forever()
-
-
+serv = HTTPServer(("",80),HttpProcessor)
+serv.serve_forever()

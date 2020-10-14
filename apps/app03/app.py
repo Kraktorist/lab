@@ -1,4 +1,5 @@
 import multiprocessing
+import signal
 import os
 import socket
 import json
@@ -19,20 +20,26 @@ class HttpProcessor(BaseHTTPRequestHandler):
       conn = sqlite3.connect(dbpath)
       c = conn.cursor()
       c.execute("SELECT * from status")
-      self.wfile.write(json.dumps(c.fetchone(),sort_keys=True, indent=4).encode())
+      conn.commit()
+      self.wfile.write(json.dumps(c.fetchall(),sort_keys=True, indent=4).encode())
+      conn.close()
     else:
-      self.wfile.write(json.dumps(dict("DB is not initialised"),sort_keys=True, indent=4).encode())
+      self.wfile.write(json.dumps("DB is not initialised",sort_keys=True, indent=4).encode())
+
+def sigterm_handler(_signo, _stack_frame):
+  print('exiting')
+  conn.close()
+  sys.exit(0)
 
 def run_webserver():
   serv = HTTPServer(("",80),HttpProcessor)
   serv.serve_forever()
 
+signal.signal(signal.SIGTERM, sigterm_handler)
 p = multiprocessing.Process(target=run_webserver, args=())
 p.daemon = True
 p.start()
 
-dbpath = os.environ['dbpath']
-hostname = os.environ['HOSTNAME']
 if not os.path.isfile(dbpath):
   conn = sqlite3.connect(dbpath)
   c = conn.cursor()
@@ -41,11 +48,13 @@ if not os.path.isfile(dbpath):
   conn.commit()
   conn.close()
 
-conn = sqlite3.connect(dbpath)
-c = conn.cursor()
-while conn:
-  c.execute("INSERT OR REPLACE INTO status VALUES (?, ?)", (strftime("%Y-%m-%d %H:%M:%S", gmtime()),hostname))
+while True:
+  conn = sqlite3.connect(dbpath)
+  c = conn.cursor()
+  c.execute("INSERT OR REPLACE INTO status (date, name) VALUES (?, ?)", (strftime("%Y-%m-%d %H:%M:%S", gmtime()),hostname))
   conn.commit()
-  c.execute("SELECT * from status")
+  c.execute("select * from status")
+  conn.commit()
+  print(c.fetchall())
+  conn.close()
   sleep(interval)
-conn.close()

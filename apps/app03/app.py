@@ -15,6 +15,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
   def do_GET(self):
     self.send_response(200)
     self.send_header('content-type','application/json')
+    self.send_header('Refresh', '2')
     self.end_headers()
     if os.path.isfile(dbpath):
       conn = sqlite3.connect(dbpath)

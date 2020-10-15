@@ -44,15 +44,19 @@ p.start()
 if not os.path.isfile(dbpath):
   conn = sqlite3.connect(dbpath)
   c = conn.cursor()
-  c.execute('''CREATE TABLE status
-             (date text, name text PRIMARY KEY)''')
+  c.executescript('''CREATE TABLE status
+             (name text PRIMARY KEY, date text, created text, interval int);
+            ''')
   conn.commit()
   conn.close()
 
 while True:
   conn = sqlite3.connect(dbpath)
   c = conn.cursor()
-  c.execute("INSERT OR REPLACE INTO status (date, name) VALUES (?, ?)", (strftime("%Y-%m-%d %H:%M:%S", gmtime()),hostname))
+  current_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+  c.execute("INSERT OR IGNORE INTO status (name, date, created, interval) VALUES (?, ?, ?, ?)", (hostname, current_date, current_date, interval))
+  conn.commit()
+  c.execute("UPDATE status SET date=? WHERE name=?", (current_date, hostname))
   conn.commit()
   c.execute("select * from status")
   conn.commit()

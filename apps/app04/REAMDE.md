@@ -5,7 +5,7 @@ First of all we need to create a bridge network "local" to provide connection be
 Then run app03 in app04.
 ``` bash
 docker network create local
-cd ./app03 
+cd ../app03 
 docker build . -t app03
 docker run -dt --name app03 --network local app03
 cd ../app04

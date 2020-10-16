@@ -11,11 +11,36 @@ docker run -dt -p 80:80 -v app03:/db app03
 ```
 Run other containers:
 ``` bash
-docker run -dt -e interval=10 -v app03:/db app03
-docker run -dt -e interval=1 -v app03:/db app03
-docker run -dt -e interval=15 -v app03:/db app03
-docker run -dt -e interval=30 -v app03:/db app03
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
 ```
 
-**_NOTE:_**  SQLite is not a shared database actually therefore there is an issue when the update of the DB stops working. If you are faced with similar issue please remove all the containers and created volume and run them again
+curl http://localhost. You should see a list of connected containers with their update timestamps
+``` json
+[
+    [
+        "b4432c407142",
+        "2020-10-16 09:18:47",
+        "2020-10-16 08:48:16",
+        3
+    ],
+    [
+        "5fc7905f152c",
+        "2020-10-16 09:18:47",
+        "2020-10-16 08:49:34",
+        10
+    ]
+]
+```
 
+**_NOTE:_**  There is an issue when the update of the DB stops working. If you are faced with similar issue please remove all the containers and created volume and run them again
+
+### Excercises
+ - run multiple containers with different ```interval```
+ - remove all the containers and check if the shared volume ```app03``` still exists
+ - create new containers and use the same volume
+ - check if you see old data on the web page
+ - copy the volume files to local filesystem
+ ...

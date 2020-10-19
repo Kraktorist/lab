@@ -1,53 +1,46 @@
-### APP01
+### APP05
 
-This simple python application creates a web-server which returns environment variables on any get request
+Simple python application to work with Postgres database.
+The app works as a web server which shows the heartbeat of all containers running this application. Every container periodically updates its status into Postgres database running in a named container.
+The interval of updates can be set as environment variable ```interval```. Default: 3 (seconds)
 
-#### Build
-
+First container should be exposed as web server working on port 80. All other containers don't need this setting.
 ``` bash
-docker build . -t app01
+docker build . -t app05
+
+```
+Run other containers:
+``` bash
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
+docker run -dt -v app03:/db app03
 ```
 
-#### Run
-
-``` bash
- docker run -dt -p 80:80 app01
-```
-#### Checks
-
-- Check you see running container
-
-``` bash
-docker ps
-```
-
-- Check you can get response from the container
-
-``` bash
-curl http://localhost
-```
-
-you shoud see a JSON which contains a set of environment variables
-
+curl http://localhost. You should see a list of connected containers with their update timestamps
 ``` json
-{
-    "GPG_KEY": "E3FF2839C048B25C084DEBE9B26995E310250568",
-    "HOME": "/root",
-    "HOSTNAME": "ba43b94015c6",
-    "LANG": "C.UTF-8",
-    "PATH": "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-    "PYTHON_GET_PIP_SHA256": "6e0bb0a2c2533361d7f297ed547237caf1b7507f197835974c0dd7eba998c53c",
-    "PYTHON_GET_PIP_URL": "https://github.com/pypa/get-pip/raw/fa7dc83944936bf09a0e4cb5d5ec852c0d256599/get-pip.py",
-    "PYTHON_PIP_VERSION": "20.2.3",
-    "PYTHON_VERSION": "3.8.6",
-    "TERM": "xterm"
-}
+[
+    [
+        "b4432c407142",
+        "2020-10-16 09:18:47",
+        "2020-10-16 08:48:16",
+        3
+    ],
+    [
+        "5fc7905f152c",
+        "2020-10-16 09:18:47",
+        "2020-10-16 08:49:34",
+        10
+    ]
+]
 ```
 
-#### Excercises
+**_NOTE:_**  There is an issue when the update of the DB stops working. If you are faced with similar issue please remove all the containers and created volume and run them again
 
-
-- run another container on a different port
-- run a container with additional environment variables
-- build an python image based on linux image
-- ...
+### Excercises
+ - run multiple containers with different ```interval```
+ - remove all the containers and check if the shared volume ```app03``` still exists
+ - create new containers and use the same volume
+ - check if you see old data on the web page
+ - copy the volume files to local filesystem
+ ...

@@ -6,6 +6,7 @@ import json
 import psycopg2
 from time import sleep, gmtime, strftime
 from http.server import BaseHTTPRequestHandler,HTTPServer
+import sys
 
 sleep(10)
 dbserver = os.environ['dbserver']

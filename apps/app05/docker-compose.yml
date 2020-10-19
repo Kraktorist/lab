@@ -30,7 +30,23 @@ services:
       dbname: "app"
       dbuser: "postgres"
       dbpassword: "mysecret"
+      interval: 4
     deploy:
-      replicas: 3
+      replicas: 2
+
+  web:
+    depends_on:
+      - postgres
+    build: ../app05
+    networks:
+      - backend
+    environment:
+      dbserver: "postgres"
+      dbname: "app"
+      dbuser: "postgres"
+      dbpassword: "mysecret"
+      interval: 4
+    ports:
+      - "80:80"
 networks:
   backend:

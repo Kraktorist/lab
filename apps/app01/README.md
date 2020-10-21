@@ -49,5 +49,5 @@ you shoud see a JSON which contains a set of environment variables
 
 - run another container on a different port
 - run a container with additional environment variables
-- build an python image based on linux image
+- build a python image by installing required packege on top of linux image
 - ...

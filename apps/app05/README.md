@@ -13,6 +13,7 @@ Build database image from ```app02```. Create a network and build a container. S
 
 First container should be exposed as web server working on port 80. All other containers don't need this setting.
 ``` bash
+docker build . -t app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=15 -p 80:80 --name app05 app05
 ```
 Run other containers:

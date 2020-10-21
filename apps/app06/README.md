@@ -5,7 +5,7 @@ This is an example of docker-compose deployment. This creates Postgres database 
 docker-compose up -d
 ```
 
-#### Excerxcises
+#### Excercises
 Work with docker-compose.
 - run the deployment
 - scale the deployment

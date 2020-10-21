@@ -6,7 +6,9 @@ import json
 import psycopg2
 from time import sleep, gmtime, strftime
 from http.server import BaseHTTPRequestHandler,HTTPServer
+import sys
 
+sleep(10)
 dbserver = os.environ['dbserver']
 dbname = os.environ['dbname']
 dbuser = os.environ['dbuser']
@@ -50,5 +52,7 @@ while True:
   c.execute("""INSERT INTO status (name, interval) VALUES (%s, %s) 
              ON CONFLICT (name) DO UPDATE
              SET interval = EXCLUDED.interval""", (hostname, interval))
+  conn.commit()
+  c.execute("""DELETE FROM status WHERE updated<NOW()-INTERVAL '60 SECONDS'""")
   conn.commit()
   sleep(interval)

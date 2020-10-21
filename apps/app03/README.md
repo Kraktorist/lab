@@ -37,7 +37,7 @@ curl http://localhost. You should see a list of connected containers with their 
 
 **_NOTE:_**  There is an issue when the update of the DB stops working. If you are faced with similar issue please remove all the containers and created volume and run them again
 
-### Excercises
+### Exercises
  - run multiple containers with different ```interval```
  - remove all the containers and check if the shared volume ```app03``` still exists
  - create new containers and use the same volume

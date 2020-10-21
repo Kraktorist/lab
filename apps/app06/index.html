@@ -13,15 +13,22 @@
   </div>
   <script>
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/data', false);
-  xhr.send();
-  if (xhr.status != 200) {
-    document.getElementById("main").innerHTML = xhr.status + ': ' + xhr.statusText;
-  } 
-  else {
-    document.getElementById("main").innerHTML = xhr.responseText;
-    document.getElementById("main").innerHTML = xhr.getResponseHeader('app_host');
-  }
+  xhr.open("GET", "/data", true);
+  xhr.onload = function (e) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        document.getElementById("main").innerHTML = xhr.responseText;
+        document.getElementById("main").innerHTML = xhr.getResponseHeader('app_host');
+      } 
+      else {
+        document.getElementById("main").innerHTML = xhr.status + ': ' + xhr.statusText;
+      }
+    }
+  };
+xhr.onerror = function (e) {
+  console.error(xhr.statusText);
+};
+xhr.send(null);
   setTimeout(() => { document.location.reload(); }, 3000);
  </script>
 </body>

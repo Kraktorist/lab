@@ -1,0 +1,28 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>A P P 0 6</title>
+  <meta name="description" content="APP06 application">
+  <meta name="app06" content="app06">
+</head>
+<body>
+  <div id="main">
+  </div>
+  <script>
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/data', false);
+  xhr.send();
+  if (xhr.status != 200) {
+    document.getElementById("main").innerHTML = xhr.status + ': ' + xhr.statusText;
+  } 
+  else {
+    document.getElementById("main").innerHTML = xhr.responseText;
+    document.getElementById("main").innerHTML = xhr.getResponseHeader('app_host');
+  }
+  setTimeout(() => { document.location.reload(); }, 3000);
+ </script>
+</body>
+</html>

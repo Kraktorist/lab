@@ -18,14 +18,13 @@ docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpas
 ```
 Run other containers:
 ``` bash
-sleep 10
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=1 app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=3 app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=5 app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=10 app05
 ```
 
-curl http://localhost. You should see a list of connected containers with their update timestamps
+curl http://localhost. You should see a list of connected containers with their last update timestamps
 ``` json
 [
     [
@@ -44,3 +43,7 @@ curl http://localhost. You should see a list of connected containers with their 
     ]
 ]
 ```
+
+#### Exercises
+- Run database and containers with another password
+- build load balancer on top of the application using nginx

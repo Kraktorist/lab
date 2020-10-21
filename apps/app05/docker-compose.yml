@@ -25,6 +25,7 @@ services:
     build: ../app05
     networks:
       - backend
+      - frontend
     environment:
       dbserver: "postgres"
       dbname: "app"
@@ -34,19 +35,17 @@ services:
     deploy:
       replicas: 2
 
-  web:
+  nginx:
     depends_on:
-      - postgres
-    build: ../app05
+      - worker
     networks:
-      - backend
-    environment:
-      dbserver: "postgres"
-      dbname: "app"
-      dbuser: "postgres"
-      dbpassword: "mysecret"
-      interval: 4
+      - frontend
+    image: nginx
+    volumes:
+      - "$PWD/proxy2.conf:/etc/nginx/conf.d/nginx.conf"
     ports:
-      - "80:80"
+      - "8081:8081"
+
 networks:
+  frontend:
   backend:

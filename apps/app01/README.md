@@ -44,7 +44,7 @@ you shoud see a JSON which contains a set of environment variables
 }
 ```
 
-#### Excercises
+#### Exercises
 
 
 - run another container on a different port

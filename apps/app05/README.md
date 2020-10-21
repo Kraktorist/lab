@@ -7,11 +7,7 @@ The interval of updates can be set as environment variable ```interval```. Defau
 
 #### Build database
 
-Build database image from app03
-Create a network and build a container
-```bash
-docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=3 app05
-```
+Build database image from ```app02```. Create a network and build a container. See ```app02``` for details
 
 #### Run applications
 
@@ -20,7 +16,8 @@ First container should be exposed as web server working on port 80. All other co
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=15 -p 80:80 --name app05 app05
 ```
 Run other containers:
-``` bashsleep 10
+``` bash
+sleep 10
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=1 app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=3 app05
 docker run -dt --network db -e dbserver="postgres" -e dbuser="postgres" -e dbpassword="mysecret" -e dbname="app" -e interval=5 app05

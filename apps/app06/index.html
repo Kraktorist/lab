@@ -109,7 +109,7 @@
         </div>
       </div>
     </div>
-    **orphaned entries will be deleted from the table in 5 minutes. 
+    **orphaned entries will be deleted from the table in 1-5 minutes. 
   </div>
 
 
@@ -134,7 +134,7 @@
               tag = '';
               background_color_class = '';
               interval = Math.abs(now - updated)/1000;
-              if ( interval > entry[1]+2) {
+              if ( interval > entry[2]+2) {
                   tag = 'No heartbeat for ' + interval + 's';
                   background_color_class = 'orphaned';
               }

@@ -4,6 +4,7 @@ This is an example of docker-compose deployment. This creates Postgres database 
 ``` bash
 docker-compose up -d
 ```
+The application is accessible on http://127.0.0.1:8081 and shows running containers and their status.
 
 #### Excercises
 Work with docker-compose.

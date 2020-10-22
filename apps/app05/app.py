@@ -22,6 +22,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
   def do_GET(self):
     self.send_response(200)
     self.send_header('content-type','application/json')
+    self.send_header('app_host', hostname)
     self.send_header('Refresh', '2')
     self.end_headers()
     if conn:
@@ -52,5 +53,7 @@ while True:
   c.execute("""INSERT INTO status (name, interval) VALUES (%s, %s) 
              ON CONFLICT (name) DO UPDATE
              SET interval = EXCLUDED.interval""", (hostname, interval))
+  conn.commit()
+  c.execute("""DELETE FROM status WHERE updated<now() - INTERVAL '5 minutes'""")
   conn.commit()
   sleep(interval)

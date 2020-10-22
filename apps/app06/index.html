@@ -1,28 +1,163 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-
   <title>A P P 0 6</title>
   <meta name="description" content="APP06 application">
   <meta name="app06" content="app06">
+  <style>
+    div.blueTable {
+      border: 1px solid #1C6EA4;
+      background-color: #EEEEEE;
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+    .divTable.blueTable .divTableCell, .divTable.blueTable .divTableHead {
+      border: 1px solid #AAAAAA;
+      padding: 3px 2px;
+    }
+    .divTable.blueTable .divTableBody .divTableCell {
+      font-size: 13px;
+    }
+    .divTable.blueTable .divTableRow:nth-child(even) {
+      background: #D0E4F5;
+    }
+    .divTable.blueTable .divTableHeading {
+      background: #1C6EA4;
+      background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      border-bottom: 2px solid #444444;
+    }
+    .divTable.blueTable .divTableHeading .divTableHead {
+      font-size: 15px;
+      font-weight: bold;
+      color: #FFFFFF;
+      border-left: 2px solid #D0E4F5;
+    }
+    .divTable.blueTable .divTableHeading .divTableHead:first-child {
+      border-left: none;
+    }
+
+    .blueTable .tableFootStyle {
+      font-size: 14px;
+    }
+    .blueTable .tableFootStyle .links {
+      text-align: right;
+    }
+    .blueTable .tableFootStyle .links a{
+      display: inline-block;
+      background: #1C6EA4;
+      color: #FFFFFF;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .blueTable.outerTableFooter {
+      border-top: none;
+    }
+    .blueTable.outerTableFooter .tableFootStyle {
+      padding: 3px 5px; 
+    }
+    /* DivTable.com */
+    .divTable{ display: table; }
+    .divTableRow { display: table-row; }
+    .divTableHeading { display: table-header-group;}
+    .divTableCell, .divTableHead { display: table-cell;}
+    .divTableHeading { display: table-header-group;}
+    .divTableFoot { display: table-footer-group;}
+    .divTableBody { display: table-row-group;}
+    .app_host {
+      font-size: 20px !important;
+      font-weight: bold;
+      text-align: center;
+    }
+    .orphaned {background-color: coral !important;}
+  </style>
 </head>
+
 <body>
-  <div id="main">
+  <div class="main">
+    <div class="divTable blueTable">
+      <div class="divTableBody">
+        <div class="divTableRow">
+          <div class="divTableCell">Nginx got request from the following container: <br>
+             We get this data by looking into http header app_host.</div>
+          <div class="divTableCell app_host"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divTable blueTable">
+      <div class="divTableHeading">
+        <div class="divTableRow">
+          <div class="divTableHead">Container</div>
+          <div class="divTableHead">Created</div>
+          <div class="divTableHead">Heartbeat</div>
+          <div class="divTableHead">Orphaned</div>
+        </div>
+      </div>
+      <div class="divTableBody data">
+        <div class="divTableRow">
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
+        </div>
+      </div>
+    </div>
+    **orphaned entries will be deleted from the table in 5 minutes. 
   </div>
+
+
   <script>
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/data', false);
-  xhr.send();
-  if (xhr.status != 200) {
-    document.getElementById("main").innerHTML = xhr.status + ': ' + xhr.statusText;
-  } 
-  else {
-    document.getElementById("main").innerHTML = xhr.responseText;
-    document.getElementById("main").innerHTML = xhr.getResponseHeader('app_host');
+  document.addEventListener("DOMContentLoaded", function(event) {
+    setInterval(() => { update_table(); }, 2000);
+  });
+
+  function update_table() {
+    var xhr = new XMLHttpRequest();
+      xhr.open("GET", "/data", true);
+      xhr.onload = function (e) {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            main = document.querySelector("div.main");
+            main.querySelector("div.app_host").innerHTML = xhr.getResponseHeader('app_host');
+            document.querySelector("div.data").innerHTML = '';
+            data = JSON.parse(xhr.responseText);
+            for (const entry of data) {
+              updated = new Date(entry[3]+' GMT');
+              now = new Date();
+              tag = '';
+              background_color_class = '';
+              interval = Math.abs(now - updated)/1000;
+              if ( interval > 15) {
+                  tag = 'No heartbeat for ' + interval + 's';
+                  background_color_class = 'orphaned';
+              }
+              datadiv = document.querySelector("div.data");
+              datadiv.innerHTML += `
+                  <div class="divTableRow" id="id${entry[1]}">
+                      <div class="divTableCell">${entry[1]}</div>
+                      <div class="divTableCell">${entry[4]}</div>
+                      <div class="divTableCell">${entry[3]}</div>
+                      <div class="divTableCell  ${background_color_class}">${tag}</div>
+                  </div>
+              `;
+            }
+          }
+          else {
+            document.getElementById("div.main").innerHTML = xhr.status + ': ' + xhr.statusText;
+          }
+        }
+      };
+      xhr.onerror = function (e) {
+        console.error(xhr.statusText);
+      };
+      xhr.send(null);
   }
-  setTimeout(() => { document.location.reload(); }, 3000);
- </script>
+  </script>
 </body>
+
 </html>

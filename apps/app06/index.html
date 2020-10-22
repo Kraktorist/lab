@@ -1,35 +1,137 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-
   <title>A P P 0 6</title>
   <meta name="description" content="APP06 application">
   <meta name="app06" content="app06">
-</head>
-<body>
-  <div id="main">
-  </div>
-  <script>
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", "/data", true);
-  xhr.onload = function (e) {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        document.getElementById("main").innerHTML = xhr.responseText;
-        document.getElementById("main").innerHTML = xhr.getResponseHeader('app_host');
-      } 
-      else {
-        document.getElementById("main").innerHTML = xhr.status + ': ' + xhr.statusText;
-      }
+  <style>
+    div.blueTable {
+      border: 1px solid #1C6EA4;
+      background-color: #EEEEEE;
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
     }
-  };
-xhr.onerror = function (e) {
-  console.error(xhr.statusText);
-};
-xhr.send(null);
-  setTimeout(() => { document.location.reload(); }, 3000);
- </script>
+    .divTable.blueTable .divTableCell, .divTable.blueTable .divTableHead {
+      border: 1px solid #AAAAAA;
+      padding: 3px 2px;
+    }
+    .divTable.blueTable .divTableBody .divTableCell {
+      font-size: 13px;
+    }
+    .divTable.blueTable .divTableRow:nth-child(even) {
+      background: #D0E4F5;
+    }
+    .divTable.blueTable .divTableHeading {
+      background: #1C6EA4;
+      background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+      border-bottom: 2px solid #444444;
+    }
+    .divTable.blueTable .divTableHeading .divTableHead {
+      font-size: 15px;
+      font-weight: bold;
+      color: #FFFFFF;
+      border-left: 2px solid #D0E4F5;
+    }
+    .divTable.blueTable .divTableHeading .divTableHead:first-child {
+      border-left: none;
+    }
+
+    .blueTable .tableFootStyle {
+      font-size: 14px;
+    }
+    .blueTable .tableFootStyle .links {
+      text-align: right;
+    }
+    .blueTable .tableFootStyle .links a{
+      display: inline-block;
+      background: #1C6EA4;
+      color: #FFFFFF;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .blueTable.outerTableFooter {
+      border-top: none;
+    }
+    .blueTable.outerTableFooter .tableFootStyle {
+      padding: 3px 5px; 
+    }
+    /* DivTable.com */
+    .divTable{ display: table; }
+    .divTableRow { display: table-row; }
+    .divTableHeading { display: table-header-group;}
+    .divTableCell, .divTableHead { display: table-cell;}
+    .divTableHeading { display: table-header-group;}
+    .divTableFoot { display: table-footer-group;}
+    .divTableBody { display: table-row-group;}
+  </style>
+</head>
+
+<body>
+  <div class="main">
+    <div class="divTable blueTable">
+      <div class="divTableBody">
+        <div class="divTableRow">
+          <div class="divTableCell">Requested container:</div>
+          <div class="divTableCell app_host"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divTable blueTable">
+      <div class="divTableHeading">
+        <div class="divTableRow">
+          <div class="divTableHead">Container</div>
+          <div class="divTableHead">Created</div>
+          <div class="divTableHead">Updated</div>
+        </div>
+      </div>
+      <div class="divTableBody data">
+        <div class="divTableRow">
+          <div class="divTableCell">cell1_1</div>
+          <div class="divTableCell">cell2_1</div>
+          <div class="divTableCell">cell3_1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/data", true);
+    xhr.onload = function (e) {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          main = document.querySelector("div.main");
+          main.querySelector("div.app_host").innerHTML = xhr.getResponseHeader('app_host');
+          document.querySelector("div.data").innerHTML = '';
+          data = JSON.parse(xhr.responseText);
+          for (const entry of data) {
+            document.querySelector("div.data").innerHTML += `
+              <div class="divTableRow" id="${entry[1]}">
+                  <div class="divTableCell">${entry[1]}</div>
+                  <div class="divTableCell">${entry[4]}</div>
+                  <div class="divTableCell">${entry[3]}</div>
+               </div>
+              `;
+          }
+        }
+        else {
+          document.getElementById("div.main").innerHTML = xhr.status + ': ' + xhr.statusText;
+        }
+      }
+    };
+    xhr.onerror = function (e) {
+      console.error(xhr.statusText);
+    };
+    xhr.send(null);
+    setTimeout(() => { document.location.reload(); }, 5000);
+  </script>
 </body>
+
 </html>

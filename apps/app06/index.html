@@ -69,6 +69,12 @@
     .divTableHeading { display: table-header-group;}
     .divTableFoot { display: table-footer-group;}
     .divTableBody { display: table-row-group;}
+    .app_host {
+      font-size: 20px !important;
+      font-weight: bold;
+      text-align: center;
+    }
+    .orphaned {background-color: coral !important;}
   </style>
 </head>
 
@@ -77,7 +83,8 @@
     <div class="divTable blueTable">
       <div class="divTableBody">
         <div class="divTableRow">
-          <div class="divTableCell">Requested container:</div>
+          <div class="divTableCell">Nginx got request from the following container: <br>
+             We get this data by looking into http header app_host.</div>
           <div class="divTableCell app_host"></div>
         </div>
       </div>
@@ -87,50 +94,69 @@
         <div class="divTableRow">
           <div class="divTableHead">Container</div>
           <div class="divTableHead">Created</div>
-          <div class="divTableHead">Updated</div>
+          <div class="divTableHead">Heartbeat</div>
+          <div class="divTableHead">Orphaned</div>
         </div>
       </div>
       <div class="divTableBody data">
         <div class="divTableRow">
-          <div class="divTableCell">cell1_1</div>
-          <div class="divTableCell">cell2_1</div>
-          <div class="divTableCell">cell3_1</div>
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
+          <div class="divTableCell"></div>
         </div>
       </div>
     </div>
+    **orphaned entries will be deleted from the table in 5 minutes. 
   </div>
 
 
   <script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    setInterval(() => { update_table(); }, 2000);
+  });
+
+  function update_table() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/data", true);
-    xhr.onload = function (e) {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          main = document.querySelector("div.main");
-          main.querySelector("div.app_host").innerHTML = xhr.getResponseHeader('app_host');
-          document.querySelector("div.data").innerHTML = '';
-          data = JSON.parse(xhr.responseText);
-          for (const entry of data) {
-            document.querySelector("div.data").innerHTML += `
-              <div class="divTableRow" id="${entry[1]}">
-                  <div class="divTableCell">${entry[1]}</div>
-                  <div class="divTableCell">${entry[4]}</div>
-                  <div class="divTableCell">${entry[3]}</div>
-               </div>
+      xhr.open("GET", "/data", true);
+      xhr.onload = function (e) {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            main = document.querySelector("div.main");
+            main.querySelector("div.app_host").innerHTML = xhr.getResponseHeader('app_host');
+            document.querySelector("div.data").innerHTML = '';
+            data = JSON.parse(xhr.responseText);
+            for (const entry of data) {
+              updated = new Date(entry[3]+' GMT');
+              now = new Date();
+              tag = '';
+              background_color_class = '';
+              interval = Math.abs(now - updated)/1000;
+              if ( interval > 15) {
+                  tag = 'No heartbeat for ' + interval + 's';
+                  background_color_class = 'orphaned';
+              }
+              datadiv = document.querySelector("div.data");
+              datadiv.innerHTML += `
+                  <div class="divTableRow" id="id${entry[1]}">
+                      <div class="divTableCell">${entry[1]}</div>
+                      <div class="divTableCell">${entry[4]}</div>
+                      <div class="divTableCell">${entry[3]}</div>
+                      <div class="divTableCell  ${background_color_class}">${tag}</div>
+                  </div>
               `;
+            }
+          }
+          else {
+            document.getElementById("div.main").innerHTML = xhr.status + ': ' + xhr.statusText;
           }
         }
-        else {
-          document.getElementById("div.main").innerHTML = xhr.status + ': ' + xhr.statusText;
-        }
-      }
-    };
-    xhr.onerror = function (e) {
-      console.error(xhr.statusText);
-    };
-    xhr.send(null);
-    setTimeout(() => { document.location.reload(); }, 5000);
+      };
+      xhr.onerror = function (e) {
+        console.error(xhr.statusText);
+      };
+      xhr.send(null);
+  }
   </script>
 </body>
 

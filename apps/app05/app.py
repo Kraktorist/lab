@@ -56,4 +56,6 @@ while True:
              ON CONFLICT (name) DO UPDATE
              SET interval = EXCLUDED.interval""", (hostname, interval))
   conn.commit()
+  c.execute("""DELETE FROM status WHERE updated<now() - INTERVAL '5 minutes'""")
+  conn.commit()
   sleep(interval)

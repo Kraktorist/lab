@@ -20,6 +20,7 @@ interval = int(os.environ['interval'])
 
 class HttpProcessor(BaseHTTPRequestHandler):
   def do_GET(self):
+    conn = psycopg2.connect(dbname=dbname, user=dbuser, password=dbpassword, host=dbserver)
     self.send_response(200)
     self.send_header('content-type','application/json')
     self.send_header('app_host', hostname)
@@ -30,6 +31,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
       c.execute("SELECT * FROM status ORDER BY inserted DESC")
       conn.commit()
       self.wfile.write(json.dumps(c.fetchall(),sort_keys=True, indent=4, default=str).encode())
+      conn.close()
     else:
       self.wfile.write(json.dumps("DB is not initialised",sort_keys=True, indent=4).encode())
 

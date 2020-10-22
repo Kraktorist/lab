@@ -121,6 +121,7 @@
   function update_table() {
     var xhr = new XMLHttpRequest();
       xhr.open("GET", "/data", true);
+      xhr.timeout = 2000;
       xhr.onload = function (e) {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
@@ -151,12 +152,13 @@
             }
           }
           else {
-            document.getElementById("div.main").innerHTML = xhr.status + ': ' + xhr.statusText;
+            document.querySelector("div.app_host").innerHTML = xhr.status + ': ' + xhr.statusText;
           }
         }
       };
       xhr.onerror = function (e) {
-        console.error(xhr.statusText);
+        document.querySelector("div.app_host").innerHTML = 'Connection error.';
+        console.log(e);
       };
       xhr.send(null);
   }

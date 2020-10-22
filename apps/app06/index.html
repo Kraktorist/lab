@@ -93,6 +93,7 @@
       <div class="divTableHeading">
         <div class="divTableRow">
           <div class="divTableHead">Container</div>
+          <div class="divTableHead">Heartbeat interval</div>
           <div class="divTableHead">Created</div>
           <div class="divTableHead">Heartbeat</div>
           <div class="divTableHead">Orphaned</div>
@@ -100,6 +101,7 @@
       </div>
       <div class="divTableBody data">
         <div class="divTableRow">
+          <div class="divTableCell"></div>
           <div class="divTableCell"></div>
           <div class="divTableCell"></div>
           <div class="divTableCell"></div>
@@ -132,7 +134,7 @@
               tag = '';
               background_color_class = '';
               interval = Math.abs(now - updated)/1000;
-              if ( interval > 15) {
+              if ( interval > entry[1]+2) {
                   tag = 'No heartbeat for ' + interval + 's';
                   background_color_class = 'orphaned';
               }
@@ -140,6 +142,7 @@
               datadiv.innerHTML += `
                   <div class="divTableRow" id="id${entry[1]}">
                       <div class="divTableCell">${entry[1]}</div>
+		      <div class="divTableCell">${entry[2]}</div>
                       <div class="divTableCell">${entry[4]}</div>
                       <div class="divTableCell">${entry[3]}</div>
                       <div class="divTableCell  ${background_color_class}">${tag}</div>

@@ -7,6 +7,7 @@ import psycopg2
 from time import sleep, gmtime, strftime
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import sys
+import random
 
 sleep(5)
 dbserver = os.environ['dbserver']
@@ -16,8 +17,8 @@ dbpassword = os.environ['dbpassword']
 conn = psycopg2.connect(dbname=dbname, user=dbuser, password=dbpassword, host=dbserver)
 
 hostname = os.environ['HOSTNAME']
-interval = int(os.environ['interval'])
-
+interval = int(os.getenv('interval', random.randint(1,20)))
+purge_time = int(os.getenv('purge_time', 300))
 class HttpProcessor(BaseHTTPRequestHandler):
   def do_GET(self):
     conn = psycopg2.connect(dbname=dbname, user=dbuser, password=dbpassword, host=dbserver)
@@ -56,6 +57,6 @@ while True:
              ON CONFLICT (name) DO UPDATE
              SET interval = EXCLUDED.interval""", (hostname, interval))
   conn.commit()
-  c.execute("""DELETE FROM status WHERE updated<now() - INTERVAL '5 minutes'""")
+  c.execute("""DELETE FROM status WHERE updated<now() - INTERVAL '%s seconds'""",(purge_time,))
   conn.commit()
   sleep(interval)

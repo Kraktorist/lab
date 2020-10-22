@@ -31,7 +31,7 @@ services:
       dbname: "app"
       dbuser: "postgres"
       dbpassword: "mysecret"
-      interval: 4
+      purge_time: 40
     deploy:
       replicas: 2
 

@@ -9,12 +9,10 @@ from http.server import BaseHTTPRequestHandler,HTTPServer
 import sys
 import random
 
-sleep(5)
 dbserver = os.environ['dbserver']
 dbname = os.environ['dbname']
 dbuser = os.environ['dbuser']
 dbpassword = os.environ['dbpassword']
-conn = psycopg2.connect(dbname=dbname, user=dbuser, password=dbpassword, host=dbserver)
 
 hostname = os.environ['HOSTNAME']
 interval = int(os.getenv('interval', random.randint(1,20)))
@@ -34,7 +32,7 @@ class HttpProcessor(BaseHTTPRequestHandler):
       self.wfile.write(json.dumps(c.fetchall(),sort_keys=True, indent=4, default=str).encode())
       conn.close()
     else:
-      self.wfile.write(json.dumps("DB is not initialised",sort_keys=True, indent=4).encode())
+      self.wfile.write(json.dumps("DB is not initialized",sort_keys=True, indent=4).encode())
 
 def sigterm_handler(_signo, _stack_frame):
   print('exiting')
@@ -50,6 +48,8 @@ p = multiprocessing.Process(target=run_webserver, args=())
 p.daemon = True
 p.start()
 
+sleep(5)
+conn = psycopg2.connect(dbname=dbname, user=dbuser, password=dbpassword, host=dbserver)
 while True:
   c = conn.cursor()
   current_date = strftime("%Y-%m-%d %H:%M:%S", gmtime())

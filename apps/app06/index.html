@@ -75,7 +75,8 @@
       text-align: center;
     }
     .orphaned {background-color: coral !important;}
-  </style>
+    .active_node {background-color: greenyellow !important;}
+</style>
 </head>
 
 <body>
@@ -96,7 +97,7 @@
           <div class="divTableHead">Heartbeat interval</div>
           <div class="divTableHead">Created</div>
           <div class="divTableHead">Heartbeat</div>
-          <div class="divTableHead">Orphaned</div>
+          <div class="divTableHead">Status</div>
         </div>
       </div>
       <div class="divTableBody data">
@@ -109,7 +110,7 @@
         </div>
       </div>
     </div>
-    **orphaned entries will be deleted from the table in 1-5 minutes. 
+    **orphaned entries will be deleted from the database in 1-5 minutes. 
   </div>
 
 
@@ -126,18 +127,24 @@
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             main = document.querySelector("div.main");
-            main.querySelector("div.app_host").innerHTML = xhr.getResponseHeader('app_host');
+            active_host = xhr.getResponseHeader('app_host');
+            main.querySelector("div.app_host").innerHTML = active_host;
             document.querySelector("div.data").innerHTML = '';
             data = JSON.parse(xhr.responseText);
             for (const entry of data) {
               updated = new Date(entry[3]+' GMT');
               now = new Date();
               tag = '';
-              background_color_class = '';
+              status_css_class = '';
               interval = Math.abs(now - updated)/1000;
               if ( interval > entry[2]+2) {
                   tag = 'No heartbeat for ' + interval + 's';
-                  background_color_class = 'orphaned';
+                  status_css_class = 'orphaned';
+              }
+              active = '';
+              if ( entry[1] === active_host) {
+                  tag = 'ACTIVE';
+                  status_css_class = 'active_node';
               }
               datadiv = document.querySelector("div.data");
               datadiv.innerHTML += `
@@ -146,7 +153,7 @@
 		      <div class="divTableCell">${entry[2]}</div>
                       <div class="divTableCell">${entry[4]}</div>
                       <div class="divTableCell">${entry[3]}</div>
-                      <div class="divTableCell  ${background_color_class}">${tag}</div>
+                      <div class="divTableCell  ${status_css_class}">${tag}</div>
                   </div>
               `;
             }

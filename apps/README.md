@@ -1,4 +1,5 @@
 Several simple Docker/Kubernetes labs.
+The main idea of these labs is to create and build typical web application. The application collects some environment data from the containers where it's running, saves the data to the database, and shows them as a web page. So we can see current state of all running containers. 
 
   - [app01](app01/README.md) Building simple python application
   - [app02](app02/README.md) Building simple database application (postgres and adminer)

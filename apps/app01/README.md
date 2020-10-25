@@ -1,6 +1,6 @@
 ### APP01
 
-This simple python application creates a web-server which returns environment variables on any get request
+This simple python application creates a web-server which returns shell environment variables on any get request
 
 #### Build
 

@@ -17,3 +17,4 @@ Several simple Docker/Kubernetes labs.
   - [app04](apps/app04/README.md) Building Nginx reverse proxy
   - [app05](apps/app05/README.md) Building Python application to work with Postgres
   - [app06](apps/app06/README.md) Building simple web application (backend + frontend + load balancer) with docker-compose
+  - TBU

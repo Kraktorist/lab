@@ -1,8 +1,8 @@
-$node1_ip = "192.168.0.51"
+$node1_ip = "192.168.1.51"
 $node1_name = "hmdck01"
-$node2_ip = "192.168.0.52"
+$node2_ip = "192.168.1.52"
 $node2_name = "hmdck02"
-$k8s_ip = "192.168.0.53"
+$k8s_ip = "192.168.1.53"
 $k8s_name = "hmkbs01"
 $pod_network = "10.244.0.0/16"
 
@@ -47,17 +47,31 @@ systemctl enable docker.service
 systemctl enable kubelet
 SCRIPT
 
+$set_node1_ip = <<-SCRIPT
+echo "KUBELET_EXTRA_ARGS=--node-ip=#{$node1_ip}">/etc/sysconfig/kubelet
+SCRIPT
+
+$set_node2_ip = <<-SCRIPT
+echo "KUBELET_EXTRA_ARGS=--node-ip=#{$node2_ip}">/etc/sysconfig/kubelet
+SCRIPT
+
+$set_node_master_ip = <<-SCRIPT
+echo "KUBELET_EXTRA_ARGS=--node-ip=#{$k8s_ip}">/etc/sysconfig/kubelet
+SCRIPT
+
+
 $install_k8s = <<-SCRIPT
 mkdir -p ~/.ssh
 ssh-keyscan -H #{$node1_ip} >> /home/vagrant/.ssh/known_hosts
 ssh-keyscan -H #{$node2_ip} >> /home/vagrant/.ssh/known_hosts
 cp /home/vagrant/.ssh/id_rsa /root/.ssh/
 cp /home/vagrant/.ssh/known_hosts /root/.ssh/known_hosts
-
 kubeadm init --apiserver-advertise-address=#{$k8s_ip} --pod-network-cidr=#{$pod_network}
 export KUBECONFIG=/etc/kubernetes/admin.conf
 echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /root/.bashrc
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+#kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+#kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml
 token=`kubeadm token create`
 hash=`openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
    openssl dgst -sha256 -hex | sed 's/^.* //'`
@@ -71,7 +85,7 @@ yum -y install nano
 mkdir /home/vagrant/.kube
 cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown -R vagrant:vagrant /home/vagrant/.kube/
-echo "source <(kubectl completion bash)" >> ~/.bashrc
+echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
 SCRIPT
 
 ### N O D E 1 ###
@@ -80,10 +94,11 @@ Vagrant.configure("2") do |config|
   config.vm.define $node1_name do |config|
     config.vm.box = "centos/7"
     config.vm.hostname = $node1_name
-    config.vm.network "public_network", ip: $node1_ip
+    config.vm.network "private_network", ip: $node1_ip
     config.vm.provision "shell", inline: $install_git
     config.vm.provision "shell", inline: $install_docker
     config.vm.provision "shell", inline: $kubernetes_prerequisites
+    config.vm.provision "shell", inline: $set_node1_ip
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.vm.provision :shell, :inline =>"
      echo 'Copying public SSH Keys to the VM'
@@ -108,10 +123,11 @@ Vagrant.configure("2") do |config|
   config.vm.define $node2_name do |config|
     config.vm.box = "centos/7"
     config.vm.hostname = $node2_name
-    config.vm.network "public_network", ip: $node2_ip
+    config.vm.network "private_network", ip: $node2_ip
     config.vm.provision "shell", inline: $install_git
     config.vm.provision "shell", inline: $install_docker
     config.vm.provision "shell", inline: $kubernetes_prerequisites
+    config.vm.provision "shell", inline: $set_node2_ip
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.vm.provision :shell, :inline =>"
      echo 'Copying public SSH Keys to the VM'
@@ -140,11 +156,12 @@ Vagrant.configure("2") do |config|
     end
     config.vm.box = "centos/7"
     config.vm.hostname = $k8s_name
-    config.vm.network "public_network", ip: $k8s_ip
+    config.vm.network "private_network", ip: $k8s_ip
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
     config.vm.provision "shell", inline: $install_git
     config.vm.provision "shell", inline: $install_docker
     config.vm.provision "shell", inline: $kubernetes_prerequisites
+    config.vm.provision "shell", inline: $set_node_master_ip
     config.vm.provision "shell", inline: $install_k8s
     config.vm.provision "shell", inline: $k8s_environment
   end

@@ -68,7 +68,9 @@ SCRIPT
 
 $k8s_environment = <<-SCRIPT
 yum -y install nano
-cp  /etc/kubernetes/admin.conf to user ~/.kube/config
+mkdir /home/vagrant/.kube
+cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+chown -R vagrant:vagrant /home/vagrant/.kube/
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 SCRIPT
 

@@ -71,7 +71,7 @@ yum -y install nano
 mkdir /home/vagrant/.kube
 cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown -R vagrant:vagrant /home/vagrant/.kube/
-echo "source <(kubectl completion bash)" >> ~/.bashrc
+echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
 SCRIPT
 
 ### N O D E 1 ###

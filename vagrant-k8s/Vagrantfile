@@ -67,8 +67,8 @@ SCRIPT
 
 
 $k8s_environment = <<-SCRIPT
-yum install nano
-cp -r /etc/kubernetes/admin.conf to user ~/.kube/config
+yum -y install nano
+cp  /etc/kubernetes/admin.conf to user ~/.kube/config
 echo "source <(kubectl completion bash)" >> ~/.bashrc
 SCRIPT
 

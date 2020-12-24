@@ -24,3 +24,10 @@ git clone https://github.com/Kraktorist/lab.git
 cd vagrant-k8s
 vagrant up
 ```
+
+to add metrics server download a mainfest edit it by adding ```--kubelet-insecure-tls``` and apply
+``` bash
+curl kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml>components.yaml
+nano components.yaml
+kubectl apply -f components.yaml
+```

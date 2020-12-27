@@ -18,3 +18,8 @@ Several simple Docker/Kubernetes labs.
   - [app05](apps/app05/README.md) Building Python application to work with Postgres
   - [app06](apps/app06/README.md) Building simple web application (backend + frontend + load balancer) with docker-compose
   - TBU
+
+
+### CKAD Practice Tests
+ - https://www.katacoda.com/liptanbiswas/courses/ckad-practice-challenges
+ 

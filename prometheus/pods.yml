@@ -27,6 +27,8 @@ spec:
     - name:  blackbox-config-folder
       hostPath:
         path:  /root/lab/prometheus/observer/blackbox
+        type: Directory
     - name:  prometheus-config-folder
       hostPath:
         path:  /root/lab/prometheus/observer/prometheus
+        type: Directory

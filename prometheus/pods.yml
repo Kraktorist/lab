@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: observer
+  name: observer
+  namespace: observer
+spec:
+  containers:
+  - image: prom/blackbox-exporter:v0.18.0
+    name: blackbox-exporter
+    ports:
+    - containerPort: 9115
+    volumeMounts:
+      - name:  blackbox-config-folder
+        mountPath:  /config
+
+  - image: prom/prometheus:v2.25.0
+    name: prometheus
+    ports:
+    - containerPort: 9090
+    volumeMounts:
+      - name:  prometheus-config-folder
+        mountPath:  /etc/prometheus
+  
+  volumes:
+    - name:  blackbox-config-folder
+      hostPath:
+        path:  /root/lab/prometheus/observer/blackbox
+    - name:  prometheus-config-folder
+      hostPath:
+        path:  /root/lab/prometheus/observer/prometheus

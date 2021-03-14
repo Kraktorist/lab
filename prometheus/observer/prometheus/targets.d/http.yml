@@ -1,0 +1,13 @@
+- targets:
+  - https://outlook.office365.com
+  - https://graph.windows.net
+  - https://manage.office.com
+  - https://login.windows.net
+  labels:
+    resource: o365
+    
+- targets:
+  - https://www.yandex.ru
+  - http://google.com 
+  labels:
+    resource: internet
